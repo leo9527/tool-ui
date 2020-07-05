@@ -3,7 +3,7 @@
  * Modified by bear on 2016/9/7.
  */
 const footerTmpl = $('#footerTmpl').html();
-const URL = "http://127.0.0.1:8080"
+const URL = "http://120.79.149.62"
 $(function() {
     var pageManager = {
         $container: $('#container'),
@@ -291,14 +291,23 @@ $(function() {
                     }, 2000);
                 }
                 var listTmpl = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd"><a href="#url#">#name#</a></div></div>',
+                    listTmplNoLink = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd">#name#</div></div>',
                     $list = $("#list");
                 var data = response.data.data;
                 var index = GetQueryString('index') ? GetQueryString('index') : 1;
                 for (var i = 0; i < data.length; ++i) {
-                    var str1 = listTmpl.replace('#image#', data[i]['format']);
-                    var str2 = str1.replace('#name#', data[i]['name']);
-                    var str3 = str2.replace('#url#', "?index=" + index + "&type=1&url=" + data[i]['url']);
-                    $list.append(str3);
+                    if (data[i]['url'] != "") {
+                        var str1 = listTmpl.replace('#image#', data[i]['format']);
+                        var str2 = str1.replace('#name#', data[i]['name']);
+                        var str3 = str2.replace('#url#', "?index=" + index + "&type=1&url=" + data[i]['url']);
+                        var html = str3
+                    } else {
+                        var str1 = listTmplNoLink.replace('#image#', data[i]['format']);
+                        var str2 = str1.replace('#name#', data[i]['name']);
+                        var html = str2
+                    }
+
+                    $list.append(html);
                 }
             })
             .catch(function(error) {

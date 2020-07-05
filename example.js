@@ -3,6 +3,7 @@
  * Modified by bear on 2016/9/7.
  */
 const footerTmpl = $('#footerTmpl').html();
+const URL = "http://127.0.0.1:8080"
 $(function() {
     var pageManager = {
         $container: $('#container'),
@@ -282,7 +283,13 @@ $(function() {
             .then(function(response) {
                 var $loadingToast = $('#loadingToast');
                 $loadingToast.fadeOut(100);
-
+                if (response.data.errno != 1) {
+                    var $toast = $('#error');
+                    $toast.fadeIn(100);
+                    setTimeout(function() {
+                        $toast.fadeOut(100);
+                    }, 2000);
+                }
                 var listTmpl = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd"><a href="#url#">#name#</a></div></div>',
                     $list = $("#list");
                 var data = response.data.data;

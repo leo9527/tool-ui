@@ -49,6 +49,28 @@
                 </div>
 
                 <div class="weui-cells" id="list"></div>
+                <!-- loading toast -->
+                <div id="loadingToast" style="display: none;">
+                    <div class="weui-mask_transparent"></div>
+                    <div class="weui-toast">
+                        <i class="weui-loading weui-icon_toast"></i>
+                        <p class="weui-toast__content">数据加载中</p>
+                    </div>
+                </div>
+                <div id="success" style="display: none;">
+                    <div class="weui-mask_transparent"></div>
+                    <div class="weui-toast">
+                        <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+                        <p class="weui-toast__content">已完成</p>
+                    </div>
+                </div>
+                <div id="error" style="display: none;">
+                    <div class="weui-mask_transparent"></div>
+                    <div class="weui-toast">
+                        <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+                        <p class="weui-toast__content">网络问题，请刷新</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -60,56 +82,10 @@
     <script src="./zepto.min.js"></script>
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
-    <script src="./example.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script>
-        var URL = "http://127.0.0.1:8080"
-
-
-        function GetQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = decodeURI(window.location.search).substr(1).match(reg);
-            if (r != null)
-                return unescape(r[2]);
-            return null;
-        }
-
-        function dir() {
-            var type = GetQueryString('type') ? GetQueryString('type') : 1;
-            var params = ""
-            var index = GetQueryString('index') ? GetQueryString('index') : 1;
-            params = "?index=" + index
-            if (type == 1) {
-                params += "&type=1" + (GetQueryString('url') ? ("&url=" + GetQueryString('url')) : "")
-            }
-
-            if (type == 2) {
-                params += "&type=2" + (GetQueryString('key') ? "&key=" + GetQueryString('key') : "")
-            }
-            axios.get(URL + '/spiderpan' + params)
-                .then(function(response) {
-                    var listTmpl = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd"><a href="#url#">#name#</a></div></div>',
-                        $list = $("#list");
-                    var data = response.data.data;
-                    var index = GetQueryString('index') ? GetQueryString('index') : 1;
-                    for (var i = 0; i < data.length; ++i) {
-                        var str1 = listTmpl.replace('#image#', data[i]['format']);
-                        var str2 = str1.replace('#name#', data[i]['name']);
-                        var str3 = str2.replace('#url#', "?index=" + index + "&type=1&url=" + data[i]['url']);
-                        $list.append(str3);
-                    }
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-        }
-
-
-        // alert(GetQueryString('pan'))
-
-        dir()
-    </script>
+    <script src="./example.js"></script>
     <script type="text/javascript">
+        var URL = "http://127.0.0.1:8080"
         $(function() {
             var $searchBar = $('#searchBar'),
                 $searchResult = $('#searchResult'),
@@ -131,10 +107,6 @@
                 $searchText.show();
             }
 
-            function to(v) {
-                var index = GetQueryString('index')
-                window.location.href = "?index=" + index + "&type=2&key=" + v
-            }
             $searchText.on('click', function() {
                 $searchBar.addClass('weui-search-bar_focusing');
                 $searchInput.focus();
@@ -146,9 +118,7 @@
                 .on('keydown', function(event) {
                     if (event.keyCode == 13) {
                         to(this.value)
-
                     }
-
                 })
 
             $searchClear.on('click', function() {
@@ -159,6 +129,11 @@
                 cancelSearch();
                 $searchInput.blur();
             });
+
+            function to(v) {
+                var index = GetQueryString('index')
+                window.location.href = "?index=" + index + "&type=2&key=" + v
+            }
         });
     </script>
 

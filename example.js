@@ -3,26 +3,26 @@
  * Modified by bear on 2016/9/7.
  */
 const footerTmpl = $('#footerTmpl').html();
-$(function () {
+$(function() {
     var pageManager = {
         $container: $('#container'),
         _pageStack: [],
         _configs: [],
-        _pageAppend: function(){},
+        _pageAppend: function() {},
         _defaultPage: null,
         _pageIndex: 1,
-        setDefault: function (defaultPage) {
+        setDefault: function(defaultPage) {
             this._defaultPage = this._find('name', defaultPage);
             return this;
         },
-        setPageAppend: function (pageAppend) {
+        setPageAppend: function(pageAppend) {
             this._pageAppend = pageAppend;
             return this;
         },
-        init: function () {
+        init: function() {
             var self = this;
 
-            $(window).on('hashchange', function () {
+            $(window).on('hashchange', function() {
                 var state = history.state || {};
                 var url = location.hash.indexOf('#') === 0 ? location.hash : '#';
                 var page = self._find('url', url) || self._defaultPage;
@@ -44,25 +44,25 @@ $(function () {
             this._go(page);
             return this;
         },
-        push: function (config) {
+        push: function(config) {
             this._configs.push(config);
             return this;
         },
-        go: function (to) {
+        go: function(to) {
             var config = this._find('name', to);
             if (!config) {
                 return;
             }
             location.hash = config.url;
         },
-        _go: function (config) {
-            this._pageIndex ++;
+        _go: function(config) {
+            this._pageIndex++;
 
-            history.replaceState && history.replaceState({_pageIndex: this._pageIndex}, '', location.href);
+            history.replaceState && history.replaceState({ _pageIndex: this._pageIndex }, '', location.href);
 
             var html = $(config.template).html();
             var $html = $(html).addClass('slideIn').addClass(config.name);
-            $html.on('animationend webkitAnimationEnd', function(){
+            $html.on('animationend webkitAnimationEnd', function() {
                 $html.removeClass('slideIn').addClass('js_show');
             });
             this.$container.append($html);
@@ -78,11 +78,11 @@ $(function () {
 
             return this;
         },
-        back: function () {
+        back: function() {
             history.back();
         },
-        _back: function (config) {
-            this._pageIndex --;
+        _back: function(config) {
+            this._pageIndex--;
 
             var stack = this._pageStack.pop();
             if (!stack) {
@@ -106,15 +106,15 @@ $(function () {
                 });
             }
 
-            stack.dom.addClass('slideOut').on('animationend webkitAnimationEnd', function () {
+            stack.dom.addClass('slideOut').on('animationend webkitAnimationEnd', function() {
                 stack.dom.remove();
             });
 
             return this;
         },
-        _findInStack: function (url) {
+        _findInStack: function(url) {
             var found = null;
-            for(var i = 0, len = this._pageStack.length; i < len; i++){
+            for (var i = 0, len = this._pageStack.length; i < len; i++) {
                 var stack = this._pageStack[i];
                 if (stack.config.url === url) {
                     found = stack;
@@ -123,7 +123,7 @@ $(function () {
             }
             return found;
         },
-        _find: function (key, value) {
+        _find: function(key, value) {
             var page = null;
             for (var i = 0, len = this._configs.length; i < len; i++) {
                 if (this._configs[i][key] === value) {
@@ -133,7 +133,7 @@ $(function () {
             }
             return page;
         },
-        _bind: function (page) {
+        _bind: function(page) {
             var events = page.events || {};
             for (var t in events) {
                 for (var type in events[t]) {
@@ -144,8 +144,8 @@ $(function () {
         }
     };
 
-    function fastClick(){
-        var supportTouch = function(){
+    function fastClick() {
+        var supportTouch = function() {
             try {
                 document.createEvent("TouchEvent");
                 return true;
@@ -155,106 +155,50 @@ $(function () {
         }();
         var _old$On = $.fn.on;
 
-        $.fn.on = function(){
-            if(/click/.test(arguments[0]) && typeof arguments[1] == 'function' && supportTouch){ // 鍙墿灞曟敮鎸乼ouch鐨勫綋鍓嶅厓绱犵殑click浜嬩欢
+        $.fn.on = function() {
+            if (/click/.test(arguments[0]) && typeof arguments[1] == 'function' && supportTouch) { // 只扩展支持touch的当前元素的click事件
                 var touchStartY, callback = arguments[1];
-                _old$On.apply(this, ['touchstart', function(e){
+                _old$On.apply(this, ['touchstart', function(e) {
                     touchStartY = e.changedTouches[0].clientY;
                 }]);
-                _old$On.apply(this, ['touchend', function(e){
+                _old$On.apply(this, ['touchend', function(e) {
                     if (Math.abs(e.changedTouches[0].clientY - touchStartY) > 10) return;
 
                     e.preventDefault();
                     callback.apply(this, [e]);
                 }]);
-            }else{
+            } else {
                 _old$On.apply(this, arguments);
             }
             return this;
         };
     }
-    function preload(){
-        $(window).on("load", function(){
-            var imgList = [
-                "./images/layers/content.png",
-                "./images/layers/navigation.png",
-                "./images/layers/popout.png",
-                "./images/layers/transparent.gif"
-            ];
-            for (var i = 0, len = imgList.length; i < len; ++i) {
-                new Image().src = imgList[i];
-            }
-        });
-    }
-    function androidInputBugFix(){
-        // .container 璁剧疆浜� overflow 灞炴€�, 瀵艰嚧 Android 鎵嬫満涓嬭緭鍏ユ鑾峰彇鐒︾偣鏃�, 杈撳叆娉曟尅浣忚緭鍏ユ鐨� bug
-        // 鐩稿叧 issue: https://github.com/weui/weui/issues/15
-        // 瑙ｅ喅鏂规硶:
-        // 0. .container 鍘绘帀 overflow 灞炴€�, 浣嗘 demo 涓嬩細寮曞彂鍒殑闂
-        // 1. 鍙傝€� http://stackoverflow.com/questions/23757345/android-does-not-correctly-scroll-on-input-focus-if-not-body-element
-        //    Android 鎵嬫満涓�, input 鎴� textarea 鍏冪礌鑱氱劍鏃�, 涓诲姩婊氫竴鎶�
+
+    function androidInputBugFix() {
+        // .container 设置了 overflow 属性, 导致 Android 手机下输入框获取焦点时, 输入法挡住输入框的 bug
+        // 相关 issue: https://github.com/weui/weui/issues/15
+        // 解决方法:
+        // 0. .container 去掉 overflow 属性, 但此 demo 下会引发别的问题
+        // 1. 参考 http://stackoverflow.com/questions/23757345/android-does-not-correctly-scroll-on-input-focus-if-not-body-element
+        //    Android 手机下, input 或 textarea 元素聚焦时, 主动滚一把
         if (/Android/gi.test(navigator.userAgent)) {
-            window.addEventListener('resize', function () {
+            window.addEventListener('resize', function() {
                 if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
-                    window.setTimeout(function () {
+                    window.setTimeout(function() {
                         document.activeElement.scrollIntoViewIfNeeded();
                     }, 0);
                 }
             })
         }
     }
-    function setJSAPI(){
-        var option = {
-            title: 'WeUI, 涓哄井淇� Web 鏈嶅姟閲忚韩璁捐',
-            desc: 'WeUI, 涓哄井淇� Web 鏈嶅姟閲忚韩璁捐',
-            link: "https://weui.io",
-            imgUrl: 'https://mmbiz.qpic.cn/mmemoticon/ajNVdqHZLLA16apETUPXh9Q5GLpSic7lGuiaic0jqMt4UY8P4KHSBpEWgM7uMlbxxnVR7596b3NPjUfwg7cFbfCtA/0'
-        };
 
-        $.getJSON('https://weui.io/api/sign?url=' + encodeURIComponent(location.href.split('#')[0]), function (res) {
-            wx.config({
-                beta: true,
-                debug: false,
-                appId: res.appid,
-                timestamp: res.timestamp,
-                nonceStr: res.nonceStr,
-                signature: res.signature,
-                jsApiList: [
-                    'onMenuShareTimeline',
-                    'onMenuShareAppMessage',
-                    'onMenuShareQQ',
-                    'onMenuShareWeibo',
-                    'onMenuShareQZone',
-                    // 'setNavigationBarColor',
-                    'setBounceBackground'
-                ]
-            });
-            wx.ready(function () {
-                /*
-                 wx.invoke('setNavigationBarColor', {
-                 color: '#F8F8F8'
-                 });
-                 */
-                wx.invoke('setBounceBackground', {
-                    'backgroundColor': '#F8F8F8',
-                    'footerBounceColor' : '#F8F8F8'
-                });
-                wx.onMenuShareTimeline(option);
-                wx.onMenuShareQQ(option);
-                wx.onMenuShareAppMessage({
-                    title: 'WeUI',
-                    desc: '涓哄井淇� Web 鏈嶅姟閲忚韩璁捐',
-                    link: location.href,
-                    imgUrl: 'https://mmbiz.qpic.cn/mmemoticon/ajNVdqHZLLA16apETUPXh9Q5GLpSic7lGuiaic0jqMt4UY8P4KHSBpEWgM7uMlbxxnVR7596b3NPjUfwg7cFbfCtA/0'
-                });
-            });
-        });
-    }
-    function setPageManager(){
-        var pages = {}, tpls = $('script[type="text/html"]');
+    function setPageManager() {
+        var pages = {},
+            tpls = $('script[type="text/html"]');
 
         for (var i = 0, len = tpls.length; i < len; ++i) {
-            var tpl = tpls[i], name = tpl.id.replace(/tpl_/, '');
+            var tpl = tpls[i],
+                name = tpl.id.replace(/tpl_/, '');
             pages[name] = {
                 name: name,
                 url: '#' + name,
@@ -267,16 +211,16 @@ $(function () {
             pageManager.push(pages[page]);
         }
         pageManager
-            .setPageAppend(function($html){
+            .setPageAppend(function($html) {
                 $html.eq(0).append(footerTmpl);
                 setTimeout(() => {
                     var $foot = $html.find('.page__ft');
-                    if($foot.length < 1) return;
+                    if ($foot.length < 1) return;
 
                     var winH = $(window).height();
-                    if($foot.position().top + $foot.height() < winH){
+                    if ($foot.position().top + $foot.height() < winH) {
                         $foot.addClass('j_bottom');
-                    }else{
+                    } else {
                         $foot.removeClass('j_bottom');
                     }
                 });
@@ -285,15 +229,86 @@ $(function () {
             .init();
     }
 
-    function init(){
-        preload();
+
+
+
+    function GetQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = decodeURI(window.location.search).substr(1).match(reg);
+        if (r != null)
+            return unescape(r[2]);
+        return null;
+    }
+
+    function dir() {
+        var type = GetQueryString('type') ? GetQueryString('type') : 1;
+        var params = ""
+        var index = GetQueryString('index') ? GetQueryString('index') : 1;
+        params = "?index=" + index
+        if (type == 1) {
+            params += "&type=1" + (GetQueryString('url') ? "&url=" + GetQueryString('url') : "")
+        }
+
+        if (type == 2) {
+            params += "&type=2" + (GetQueryString('key') ? "&key=" + GetQueryString('key') : "")
+        }
+        axios.interceptors.request.use((config) => {
+            // 对响应数据做点什么
+            console.log(config);
+            var $loadingToast = $('#loadingToast');
+            $loadingToast.fadeIn(100);
+            return config;
+        }, function(error) {
+            // 对响应错误做点什么
+            return Promise.reject(error);
+        });
+        axios.interceptors.response.use((response) => {
+            // 对响应数据做点什么
+            console.log(response);
+            if (response.status != "200") {
+                var $toast = $('#error');
+                $toast.fadeIn(100);
+                setTimeout(function() {
+                    $toast.fadeOut(100);
+                }, 2000);
+            }
+
+            return response;
+        }, function(error) {
+            // 对响应错误做点什么
+            return Promise.reject(error);
+        });
+        axios.get(URL + '/spiderpan' + params)
+            .then(function(response) {
+                var $loadingToast = $('#loadingToast');
+                $loadingToast.fadeOut(100);
+
+                var listTmpl = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd"><a href="#url#">#name#</a></div></div>',
+                    $list = $("#list");
+                var data = response.data.data;
+                var index = GetQueryString('index') ? GetQueryString('index') : 1;
+                for (var i = 0; i < data.length; ++i) {
+                    var str1 = listTmpl.replace('#image#', data[i]['format']);
+                    var str2 = str1.replace('#name#', data[i]['name']);
+                    var str3 = str2.replace('#url#', "?index=" + index + "&type=1&url=" + data[i]['url']);
+                    $list.append(str3);
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    }
+
+
+
+    function init() {
         fastClick();
         androidInputBugFix();
-        setJSAPI();
+        dir();
         setPageManager();
 
         window.pageManager = pageManager;
-        window.home = function(){
+        window.home = function() {
             location.hash = '';
         };
     }

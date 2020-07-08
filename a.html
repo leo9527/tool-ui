@@ -137,7 +137,7 @@
             });
 
             function to(v) {
-                var index = GetQueryString('index')
+                var index = GetQueryString('index') ? GetQueryString('index') : 1
                 window.location.href = "?index=" + index + "&type=2&key=" + v
             }
         });

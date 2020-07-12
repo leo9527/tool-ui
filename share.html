@@ -17,14 +17,7 @@
 
     <script type="text/html" id="tpl_home">
         <div class="page">
-            <div class="page__hd">
 
-                <center>
-                    <a><img src="./images/1.jpg" style="width:100px" /></a>
-                    <h4>客服微信：wrs317</h4>
-                </center>
-
-            </div>
             <div class="page__hd">
 
                 <!--<a href="javascript:" class="weui-btn weui-btn_primary">点击展现searchBar</a>-->
@@ -43,9 +36,7 @@
                     <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
                 </div>
                 <div class="button-sp-area">
-                    <a href="?index=1" class="weui-btn weui-btn_mini weui-btn_default">A盘</a>
-                    <a href="?index=2" class="weui-btn weui-btn_mini weui-btn_default">B盘</a>
-                    <a href="?index=3" class="weui-btn weui-btn_mini weui-btn_default">C盘</a>
+                    <a href="?name=touch_id1999&gid=872282955597993169" class="weui-btn weui-btn_mini weui-btn_default">萌萌家终身成长A002群</a>
                 </div>
 
                 <div class="weui-cells" id="list"></div>
@@ -83,7 +74,7 @@
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="./example.js"></script>
+    <script src="./share.js"></script>
     <script type="text/javascript">
         function GetQueryString(name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -137,8 +128,8 @@
             });
 
             function to(v) {
-                var index = GetQueryString('index') ? GetQueryString('index') : 1
-                window.location.href = "?index=" + index + "&type=2&key=" + v
+                var index = GetQueryString('name') ? GetQueryString('name') : "touch_id1999"
+                window.location.href = "?name=" + index + "&type=2&key=" + v
             }
         });
     </script>

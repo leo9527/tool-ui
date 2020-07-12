@@ -3,7 +3,7 @@
  * Modified by bear on 2016/9/7.
  */
 const footerTmpl = $('#footerTmpl').html();
-const URL = "http://127.0.0.1:8080"
+const URL = "http://120.79.149.62"
 $(function() {
     var pageManager = {
         $container: $('#container'),

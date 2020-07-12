@@ -239,7 +239,7 @@ $(function() {
         var type = GetQueryString('type') ? GetQueryString('type') : 1;
         var params = ""
         var index = GetQueryString('name') ? GetQueryString('name') : 'touch_id1999';
-        var gid = GetQueryString('gid')
+        var gid = GetQueryString('gid') ? GetQueryString('gid') : '872282955597993169'
         params = "?name=" + index + "&gid=" + gid
         var msgId = GetQueryString('msg_id')
         var fsId = GetQueryString('fs_id')

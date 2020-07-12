@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <title>佐佐团队-学习库</title>
+    <link rel="stylesheet" href="./style/weui.css" />
+    <link rel="stylesheet" href="./example.css" />
+    <link rel="stylesheet" href="./ico.css" />
+</head>
+
+<body ontouchstart>
+    <div class="weui-toptips weui-toptips_warn js_tooltips">错误提示</div>
+
+    <div class="container" id="container"></div>
+
+    <script type="text/html" id="tpl_home">
+        <div class="page">
+            <div class="page__hd">
+                <h1 class="page__title">
+                    WeUI
+                </h1>
+
+                <p class="page__desc">可以使用的功能。</p>
+            </div>
+            <div class="page__bd page__bd_spacing">
+                <ul>
+                    <li>
+                        <div class="weui-flex js_category">
+                            <p class="weui-flex__item">客户使用的</p>
+                            <img src="./images/icon_nav_form.png" alt="">
+                        </div>
+                        <div class="page__category js_categoryInner">
+                            <div class="weui-cells page__category-content">
+                                <a class="weui-cell weui-cell_active weui-cell_access js_item" href="a.html">
+                                    <div class="weui-cell__bd">
+                                        <p>wrs312</p>
+                                    </div>
+                                    <div class="weui-cell__ft"></div>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="weui-flex js_category">
+                            <p class="weui-flex__item">自己使用的</p>
+                            <img src="./images/icon_nav_form.png" alt="">
+                        </div>
+                        <div class="page__category js_categoryInner">
+                            <div class="weui-cells page__category-content">
+                                <a class="weui-cell weui-cell_active weui-cell_access js_item" href="self.html">
+                                    <div class="weui-cell__bd">
+                                        <p>网盘库</p>
+                                    </div>
+                                    <div class="weui-cell__ft"></div>
+                                </a>
+                                <a class="weui-cell weui-cell_active weui-cell_access js_item" href="share.html">
+                                    <div class="weui-cell__bd">
+                                        <p>文件库</p>
+                                    </div>
+                                    <div class="weui-cell__ft"></div>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                var winH = $(window).height();
+                var categorySpace = 10;
+
+                $('.js_item').on('click', function() {
+                    var id = $(this).data('id');
+                    window.pageManager.go(id);
+                });
+                $('.js_category').on('click', function() {
+                    var $this = $(this),
+                        $inner = $this.next('.js_categoryInner'),
+                        $page = $this.parents('.page'),
+                        $parent = $(this).parent('li');
+                    var innerH = $inner.data('height');
+
+                    if (!innerH) {
+                        $inner.css('height', 'auto');
+                        innerH = $inner.height();
+                        $inner.removeAttr('style');
+                        $inner.data('height', innerH);
+                    }
+
+                    if ($parent.hasClass('js_show')) {
+                        $parent.removeClass('js_show');
+                    } else {
+                        $parent.siblings().removeClass('js_show');
+
+                        $parent.addClass('js_show');
+                        if (this.offsetTop + this.offsetHeight + innerH > $page.scrollTop() + winH) {
+                            var scrollTop = this.offsetTop + this.offsetHeight + innerH - winH + categorySpace;
+
+                            if (scrollTop > this.offsetTop) {
+                                scrollTop = this.offsetTop - categorySpace;
+                            }
+
+                            $page.scrollTop(scrollTop);
+                        }
+                    }
+
+                    var winH = $(window).height();
+                    var $foot = $('body').find('.page__ft');
+                    if ($foot.length < 1) return;
+
+                    if ($foot.position().top + $foot.height() < winH) {
+                        $foot.addClass('j_bottom');
+                    } else {
+                        $foot.removeClass('j_bottom');
+                    }
+                });
+            });
+        </script>
+
+
+
+        <script src="./zepto.min.js"></script>
+        <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="./share.js"></script>
+        <script type="text/javascript">
+            function GetQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = decodeURI(window.location.search).substr(1).match(reg);
+                if (r != null)
+                    return unescape(r[2]);
+                return null;
+            }
+            $(function() {
+                var $searchBar = $('#searchBar'),
+                    $searchResult = $('#searchResult'),
+                    $searchText = $('#searchText'),
+                    $searchInput = $('#searchInput'),
+                    $searchClear = $('#searchClear'),
+                    $searchCancel = $('#searchCancel');
+
+
+                function hideSearchResult() {
+                    $searchResult.hide();
+                    $searchInput.val('');
+
+                }
+
+                function cancelSearch() {
+                    hideSearchResult();
+                    $searchBar.removeClass('weui-search-bar_focusing');
+                    $searchText.show();
+                }
+
+                $searchText.on('click', function() {
+                    $searchBar.addClass('weui-search-bar_focusing');
+                    $searchInput.focus();
+                });
+                $searchInput
+                    .on('blur', function() {
+                        if (!this.value.length) cancelSearch();
+                    })
+                    .on('keydown', function(event) {
+                        if (event.keyCode == 13) {
+                            to(this.value)
+                        }
+                    })
+
+                $searchClear.on('click', function() {
+                    hideSearchResult();
+                    $searchInput.focus();
+                });
+                $searchCancel.on('click', function() {
+                    cancelSearch();
+                    $searchInput.blur();
+                });
+
+                function to(v) {
+                    var index = GetQueryString('name') ? GetQueryString('name') : "touch_id1999"
+                    window.location.href = "?name=" + index + "&type=2&key=" + v
+                }
+            });
+        </script>
+
+</body>
+
+</html>

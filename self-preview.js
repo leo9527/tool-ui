@@ -3,7 +3,6 @@
  * Modified by bear on 2016/9/7.
  */
 const footerTmpl = $('#footerTmpl').html();
-
 var dev = 0
 const URL = dev ? "http://127.0.0.1:8080" : "http://120.79.149.62"
 
@@ -14,6 +13,73 @@ function GetQueryString(name) {
         return unescape(r[2]);
     return null;
 }
+
+function showDialog(id) {
+    $('#showDialog' + id).on('click', function() {
+        $('#dialog' + id).fadeIn(200);
+    });
+}
+
+function hiddenDialog(id) {
+    $('#dialog' + id).on('click', function() {
+        $('.js_dialog').fadeOut(200);
+    });
+}
+
+function deleteFile(file) {
+    var params = '?name=' + GetQueryString('name') + "&file=" + file
+    axios.get(URL + '/pan/deleteFile' + params)
+        .then(function(response) {
+            var $loadingToast = $('#loadingToast');
+            $loadingToast.fadeOut(100);
+            if (response.data.errno != 1) {
+                var $toast = $('#error');
+                $toast.fadeIn(100);
+                setTimeout(function() {
+                    $toast.fadeOut(100);
+                }, 2000);
+            }
+            var data = response.data.data;
+            alert(data.taskid)
+            taskQuery(data.taskid)
+
+
+
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+}
+
+function taskQuery(taskId) {
+    var params = "?name=" + GetQueryString('name') + "&taskid=" + taskId
+    axios.get(URL + '/pan/taskQuery' + params)
+        .then(function(response) {
+            var $loadingToast = $('#loadingToast');
+            $loadingToast.fadeOut(100);
+            if (response.data.errno != 1) {
+                var $toast = $('#error');
+                $toast.fadeIn(100);
+                setTimeout(function() {
+                    $toast.fadeOut(100);
+                }, 2000);
+            }
+            var data = response.data.data;
+            if (data.status == 'success') {
+                window.location.href = window.location.search
+            } else {
+                setTimeout(function() {
+                    taskQuery(taskId)
+                }, 2000);
+
+            }
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+}
+
+
 var pageManager = {
     $container: $('#container'),
     _pageStack: [],
@@ -293,29 +359,41 @@ function dir() {
                     $toast.fadeOut(100);
                 }, 2000);
             }
-            var listTmpl = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd"><a href="#url#">#name#</a></div></div>',
-                listTmplNoLink = '<div class="weui-cell  weui-cell_example"><div class="weui-cell__hd"><span class="#image#" alt=""></span></div><div class="weui-cell__bd">#name#</div></div>',
+            var listTmpl = '<div  class="weui-grid"><a  target="_blank" href="#url#"><div class="weui-grid__icon #image#"></div></a><p class="weui-grid__label">#name#</p><p class="weui-grid__label">#delete#</p></div>',
+                listTmplNoLink = '<div  class="weui-grid"><p class="weui-grid__label">#name#</p><a  target="_blank" href="#url#"><div class="weui-grid__icon preview_thumb"><img src="#image#" alt=""></div></a><p class="weui-grid__label">#delete#</p></div>',
+                deleteButtonTpl = '<font color="red" id="showDialog#id#" onclick="showDialog(#id#)">删除</font>',
+                dialogTpl = '<div class="js_dialog" id="dialog#id#" style="display: none;"><div class="weui-mask"></div><div class="weui-dialog"><div class="weui-dialog__hd"><strong class="weui-dialog__title">弹窗标题</strong></div><div class="weui-dialog__bd">确定删除：#name#？</div><div class="weui-dialog__ft"><a class="weui-dialog__btn weui-dialog__btn_default" onclick="hiddenDialog(#id#)">取消</a><a onclick="deleteFile(#file#)" id="delete_file#id#" class="weui-dialog__btn weui-dialog__btn_primary">确定</a></div></div></div>',
+                $dialogList = $("#dialog_list"),
                 $list = $("#list");
-            var buttonTpl = '<a href="#url#" class="weui-btn weui-btn_mini weui-btn_default">切到预览版</a>',
+            var buttonTpl = '<a href="#url#" class="weui-btn weui-btn_mini weui-btn_warn">切到列表版</a>',
                 $button = $("#view_button");
-            var url = 'self-preview.html' + window.location.search
+            var url = 'self.html' + window.location.search
             var html = buttonTpl.replace('#url#', url);
             $button.append(html)
             var data = response.data.data;
             var name = GetQueryString('name') ? GetQueryString('name') : 'touch_id1999';
             for (var i = 0; i < data.length; ++i) {
-                if (data[i]['url'] != "") {
+                if (data[i]['url'] != "" || data[i]['thumbs'] == '') {
                     var str1 = listTmpl.replace('#image#', data[i]['format']);
                     var str2 = str1.replace('#name#', data[i]['name']);
                     var str3 = str2.replace('#url#', "?name=" + index + "&type=1&dir=" + data[i]['url']);
                     var html = str3
                 } else {
-                    var str1 = listTmplNoLink.replace('#image#', data[i]['format']);
+                    var str1 = listTmplNoLink.replace('#image#', data[i]['thumbs']['url3']);
                     var str2 = str1.replace('#name#', data[i]['name']);
-                    var html = str2
+                    var str3 = str2.replace('#url#', data[i]['thumbs']['url3']);
+                    var html = str3
                 }
-
+                var buttonHtml = deleteButtonTpl.replace('#id#', data[i]['fs_id'])
+                buttonHtml = buttonHtml.replace('#id#', data[i]['fs_id'])
+                html = html.replace('#delete#', buttonHtml)
                 $list.append(html);
+                var dialogHtml = dialogTpl.replace('#id#', data[i]['fs_id'])
+                dialogHtml = dialogHtml.replace('#id#', data[i]['fs_id'])
+                dialogHtml = dialogHtml.replace('#id#', data[i]['fs_id'])
+                dialogHtml = dialogHtml.replace('#file#', "'" + data[i]['path'] + "'")
+                dialogHtml = dialogHtml.replace('#name#', data[i]['name'])
+                $dialogList.append(dialogHtml);
             }
         })
         .catch(function(error) {
@@ -323,11 +401,42 @@ function dir() {
         });
 }
 
+function su() {
+    axios.get(URL + '/pan/su')
+        .then(function(response) {
+            var $loadingToast = $('#loadingToast');
+            $loadingToast.fadeOut(100);
+            if (response.data.errno != 1) {
+                var $toast = $('#error');
+                $toast.fadeIn(100);
+                setTimeout(function() {
+                    $toast.fadeOut(100);
+                }, 2000);
+            }
+            var suTpl = '<a href="#url#" class="weui-btn weui-btn_mini weui-btn_default">#name#</a>',
+                $suList = $('#su_list');
+            var data = response.data.data
+            var keys = Object.keys(data)
+
+            for (var i = 0; i < keys.length; ++i) {
+                var name = keys[i]
+                var url = data[keys[i]]
+                var html = suTpl.replace('#name#', name)
+                html = html.replace('#url#', url)
+                $suList.append(html)
+            }
+
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+}
 
 
 function init() {
     fastClick();
     androidInputBugFix();
+    su();
     dir();
     setPageManager();
 

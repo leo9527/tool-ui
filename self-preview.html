@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="./style/weui.css" />
     <link rel="stylesheet" href="./example.css" />
     <link rel="stylesheet" href="./ico.css" />
+    <style>
+        .preview_thumb {
+            min-width: 280px;
+            height: 280px
+        }
+    </style>
 </head>
 
 <body ontouchstart>
@@ -24,8 +30,7 @@
                     <a><img src="./images/wrs312.png" style="width:100px" /></a>
                     <h4>客服微信：wrs312</h4>
                 </center>
-                <center id='view_button'>
-                </center>
+                <center id="view_button"></center>
             </div>
             <div class="page__hd">
 
@@ -44,13 +49,14 @@
                     </div>
                     <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
                 </div>
-                <div class="button-sp-area">
-                    <a href="?name=touch_id1999" class="weui-btn weui-btn_mini weui-btn_default">touch_id1999</a>
+                <div class="button-sp-area" id="su_list">
+                    <!-- <a href="?name=touch_id1999" class="weui-btn weui-btn_mini weui-btn_default">touch_id1999</a>
                     <a href="?name=18150658549" class="weui-btn weui-btn_mini weui-btn_default">18150658549</a>
                     <a href="?name=a871112780" class="weui-btn weui-btn_mini weui-btn_default">a871112780</a>
-                    <a href="?name=sophie00777" class="weui-btn weui-btn_mini weui-btn_default">sophie00777</a>
+                    <a href="?name=sophie00777" class="weui-btn weui-btn_mini weui-btn_default">sophie00777</a> -->
                 </div>
-                <div class="weui-cells" id="list"></div>
+                <div class="weui-grids" id="list"></div>
+                <div id="dialog_list"></div>
                 <!-- loading toast -->
                 <div id="loadingToast" style="display: none;">
                     <div class="weui-mask_transparent"></div>
@@ -85,7 +91,7 @@
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="./self.js"></script>
+    <script src="./self-preview.js"></script>
     <script type="text/javascript">
         $(function() {
             var $searchBar = $('#searchBar'),

@@ -35,8 +35,7 @@
                     </div>
                     <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
                 </div>
-                <div class="button-sp-area">
-                    <a href="?name=touch_id1999&gid=872282955597993169" class="weui-btn weui-btn_mini weui-btn_default">萌萌家终身成长A002群</a>
+                <div class="button-sp-area" id='su_list'>
                 </div>
 
                 <div class="weui-cells" id="list"></div>
@@ -76,13 +75,6 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./share.js"></script>
     <script type="text/javascript">
-        function GetQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = decodeURI(window.location.search).substr(1).match(reg);
-            if (r != null)
-                return unescape(r[2]);
-            return null;
-        }
         $(function() {
             var $searchBar = $('#searchBar'),
                 $searchResult = $('#searchResult'),
